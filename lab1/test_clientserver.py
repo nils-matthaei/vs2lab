@@ -5,7 +5,7 @@ Simple client server unit test
 import logging
 import threading
 import unittest
-
+import json
 import clientserver
 from context import lab_logging
 
@@ -15,7 +15,14 @@ lab_logging.setup(stream_level=logging.INFO)
 class TestEchoService(unittest.TestCase):
     """The test"""
     _server = clientserver.Server()  # create single server in class variable
-    _server_thread = threading.Thread(target=_server.serve)  # define thread for running server
+    _server_thread = threading.Thread(target=_server.serve)
+    _phone_book = {
+            "Alice": "123-456-7890",
+            "Bob": "987-654-3210",
+            "Charlie": "555-555-5555",
+            "David": "444-444-4444",
+            "Eve": "333-333-3333"
+        }
 
     @classmethod
     def setUpClass(cls):
@@ -25,10 +32,18 @@ class TestEchoService(unittest.TestCase):
         super().setUp()
         self.client = clientserver.Client()  # create new client for each test
 
-    def test_srv_get(self):  # each test_* function is a test
+    def test_get(self):  # each test_* function is a test
+        msg = self.client.get_number("Bob")
+        self.assertEqual(msg, '987-654-3210')
+
+    def test_get_wrong_name(self):  # each test_* function is a test
+            msg = self.client.get_number("Dr. Christian Pape")
+            self.assertEqual(msg, 'Name not found')
+
+    def test_get_all(self):  # each test_* function is a test
         """Test simple call"""
-        msg = self.client.call("Hello VS2Lab")
-        self.assertEqual(msg, 'Hello VS2Lab*')
+        msg = self.client.get_all_numbers()
+        self.assertEqual(msg, json.dumps(self._phone_book))
 
     def tearDown(self):
         self.client.close()  # terminate client after each test
