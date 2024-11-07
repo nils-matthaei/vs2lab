@@ -34,7 +34,7 @@ class Client:
         if(msgrcv[1] == constRPC.OK):
             print('Recieved ACK')
         else:
-            print(msgrcv)
+            print(msgrcv)  #Was tun wenn kein ACK?
             
         res = self.chan.receive_from(self.server)
         cb(self, res[1])
