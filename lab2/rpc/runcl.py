@@ -23,7 +23,7 @@ for i in range(11):
     print(f"Client still active [{i}]")
     time.sleep(1)
 
-cl.close()
+cl.stop()
 
 # Unklar: Wann client schliessen?
 # Entweder im callback oder so wie aktuell implementiert (Wenn der Client vor dem return des callbacks geschlossen wird, stuerzt der Server ab)
