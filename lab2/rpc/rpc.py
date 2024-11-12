@@ -1,5 +1,6 @@
 import time
 import constRPC
+import threading
 
 from context import lab_channel
 
@@ -18,6 +19,7 @@ class Client:
         self.chan = lab_channel.Channel()
         self.client = self.chan.join('client')
         self.server = None
+        self.ack_event = threading.Event()
 
     def run(self):
         self.chan.bind(self.client)
@@ -32,7 +34,8 @@ class Client:
         self.chan.send_to(self.server, msglst)  # send msg to server
         msgrcv = self.chan.receive_from(self.server) 
         if(msgrcv[1] == constRPC.OK):
-            print('Recieved ACK')
+            # print('Recieved ACK')
+            self.ack_event.set()
         else:
             print(msgrcv)  #Was tun wenn kein ACK?
             
@@ -60,6 +63,7 @@ class Server:
                 client = msgreq[0]  # see who is the caller
                 msgrpc = msgreq[1]  # fetch call & parameters
                 if constRPC.APPEND == msgrpc[0]:
+                    time.sleep(5)
                     self.chan.send_to({client}, constRPC.OK)
                     time.sleep(10)
                     result = self.append(msgrpc[1], msgrpc[2])  # do local call

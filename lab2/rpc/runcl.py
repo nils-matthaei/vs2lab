@@ -18,8 +18,13 @@ base_list = rpc.DBList({'foo'})
 append_thread = threading.Thread(target=cl.append, args=('bar', base_list, show_rpc_result))
 append_thread.start()
 
+print('Thread started, waiting for ACK...')
 
-for i in range(11):
+cl.ack_event.wait()
+
+print('ACK received')
+
+for i in range(22):
     print(f"Client still active [{i}]")
     time.sleep(1)
 
