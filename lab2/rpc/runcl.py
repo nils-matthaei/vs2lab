@@ -25,7 +25,7 @@ cl.ack_event.wait()
 print('ACK received')
 
 for i in range(22):
-    print(f"Client still active [{i}]")
+    cl.ping()
     time.sleep(1)
 
 cl.stop()

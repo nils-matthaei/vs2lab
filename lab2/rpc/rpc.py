@@ -25,19 +25,21 @@ class Client:
         self.chan.bind(self.client)
         self.server = self.chan.subgroup('server')
 
+    def ping(self):
+        print("Client is responsive...")
+
     def stop(self):
         self.chan.leave('client')
 
     def append(self, data, db_list, cb):
         assert isinstance(db_list, DBList)
         msglst = (constRPC.APPEND, data, db_list) 
-        self.chan.send_to(self.server, msglst)  # send msg to server
+        self.chan.send_to(self.server, msglst)
         msgrcv = self.chan.receive_from(self.server) 
         if(msgrcv[1] == constRPC.OK):
-            # print('Recieved ACK')
             self.ack_event.set()
         else:
-            print(msgrcv)  #Was tun wenn kein ACK?
+            print(msgrcv) 
             
         res = self.chan.receive_from(self.server)
         cb(self, res[1])
