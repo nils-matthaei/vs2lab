@@ -15,15 +15,17 @@ cl.run()
 
 base_list = rpc.DBList({'foo'})
 
-append_thread = threading.Thread(target=cl.append, args=('bar', base_list, show_rpc_result))
-append_thread.start()
+# append_thread = threading.Thread(target=cl.append, args=('bar', base_list, show_rpc_result))
+# append_thread.start()
 
-print('Thread started, waiting for ACK...')
+# print('Thread started, waiting for ACK...')
 
-cl.ack_event.wait()
+# cl.ack_event.wait()
 
-print('ACK received')
+# print('ACK received')
 
+cl.append_async('bar', base_list, show_rpc_result)
+cl.append_async('bar2', base_list, show_rpc_result)
 for i in range(22):
     cl.ping()
     time.sleep(1)

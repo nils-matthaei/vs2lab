@@ -45,6 +45,31 @@ class Client:
         cb(self, res[1])
         # return msgrcv[1]  # pass it to caller
 
+    def append_async(self, data, db_list, cb):
+        assert isinstance(db_list, DBList)
+
+        ack_received_event = threading.Event()
+
+        def run():
+            msglst = (constRPC.APPEND, data, db_list)
+            self.chan.send_to(self.server, msglst)
+            print("Blocking until ACK")
+            msgrcv = self.chan.receive_from(self.server)
+            if msgrcv[1] == constRPC.OK:
+                ack_received_event.set()
+                print("ACK received")
+            else:
+                print(msgrcv)
+
+            print("Thread is now waiting for server res...")
+            res = self.chan.receive_from(self.server)
+            cb(self, res[1])
+
+        thread = threading.Thread(target=run)
+        thread.start()
+
+        ack_received_event.wait()
+
 
 class Server:
     def __init__(self):
