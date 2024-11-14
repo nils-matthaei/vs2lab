@@ -20,7 +20,7 @@ class Client:
         self.client = self.chan.join('client')
         self.server = None
         self.ack_event = threading.Event()
-
+        self.active_threads = 0
     def run(self):
         self.chan.bind(self.client)
         self.server = self.chan.subgroup('server')
@@ -31,19 +31,12 @@ class Client:
     def stop(self):
         self.chan.leave('client')
 
-    def append(self, data, db_list, cb):
+    def append(self, data, db_list):
         assert isinstance(db_list, DBList)
-        msglst = (constRPC.APPEND, data, db_list) 
-        self.chan.send_to(self.server, msglst)
-        msgrcv = self.chan.receive_from(self.server) 
-        if(msgrcv[1] == constRPC.OK):
-            self.ack_event.set()
-        else:
-            print(msgrcv) 
-            
-        res = self.chan.receive_from(self.server)
-        cb(self, res[1])
-        # return msgrcv[1]  # pass it to caller
+        msglst = (constRPC.APPEND, data, db_list)  # message payload
+        self.chan.send_to(self.server, msglst)  # send msg to server
+        msgrcv = self.chan.receive_from(self.server)  # wait for response
+        return msgrcv[1]  # pass it to caller
 
     def append_async(self, data, db_list, cb):
         assert isinstance(db_list, DBList)
@@ -63,8 +56,10 @@ class Client:
 
             print("Thread is now waiting for server res...")
             res = self.chan.receive_from(self.server)
+            self.active_threads -= 1
             cb(self, res[1])
 
+        self.active_threads += 1
         thread = threading.Thread(target=run)
         thread.start()
 
@@ -90,7 +85,7 @@ class Server:
                 client = msgreq[0]  # see who is the caller
                 msgrpc = msgreq[1]  # fetch call & parameters
                 if constRPC.APPEND == msgrpc[0]:
-                    time.sleep(5)
+                    time.sleep(2)
                     self.chan.send_to({client}, constRPC.OK)
                     time.sleep(10)
                     result = self.append(msgrpc[1], msgrpc[2])  # do local call
