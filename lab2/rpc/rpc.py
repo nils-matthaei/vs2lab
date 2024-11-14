@@ -56,8 +56,8 @@ class Client:
 
             print("Thread is now waiting for server res...")
             res = self.chan.receive_from(self.server)
+            cb(res[1])
             self.active_threads -= 1
-            cb(self, res[1])
 
         self.active_threads += 1
         thread = threading.Thread(target=run)

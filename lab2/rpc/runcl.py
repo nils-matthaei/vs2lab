@@ -5,7 +5,7 @@ import threading
 
 from context import lab_logging
 
-def show_rpc_result(cl, result):
+def show_rpc_result(result):
     print("Result: {}".format(result.value))
 
 lab_logging.setup(stream_level=logging.INFO)
