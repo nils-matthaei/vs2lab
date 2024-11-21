@@ -7,8 +7,8 @@ import zmq
 import constPipe
 
 me = str(sys.argv[1])
-address1 = "tcp://" + constPipe.SRC1 + ":" + constPipe.PORT1  # 1st task src
-address2 = "tcp://" + constPipe.SRC2 + ":" + constPipe.PORT2  # 2nd task src
+address1 = "tcp://" + constPipe.SRC1 + ":" + constPipe.PORT1
+address2 = "tcp://" + constPipe.SRC2 + ":" + constPipe.PORT2
 
 context = zmq.Context()
 pull_socket = context.socket(zmq.PULL)  # create a pull socket
@@ -16,7 +16,7 @@ pull_socket = context.socket(zmq.PULL)  # create a pull socket
 pull_socket.connect(address1)  # connect to task source 1
 pull_socket.connect(address2)  # connect to task source 2
 
-time.sleep(1) 
+time.sleep(1)
 
 print("{} started".format(me))
 

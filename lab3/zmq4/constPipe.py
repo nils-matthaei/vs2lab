@@ -1,0 +1,29 @@
+SPLITTER_ADR = "127.0.0.1"
+SPLITTER_PRT = "50011"
+
+MAPPER_ADR1 = "127.0.0.1"
+MAPPER_PRT1_1 = "50012"
+MAPPER_PRT1_2 = "50013"
+
+MAPPER_ADR2 = "127.0.0.1"
+MAPPER_PRT2_1 = "50014"
+MAPPER_PRT2_2 = "50015"
+
+MAPPER_ADR3 = "127.0.0.1"
+MAPPER_PRT3_1 = "50016"
+MAPPER_PRT3_2 = "50017"
+
+MAPPER_TREE = {
+    "m1": {
+        "1": MAPPER_PRT1_1,
+        "2": MAPPER_PRT1_2
+    },
+    "m2": {
+        "1": MAPPER_PRT2_1,
+        "2": MAPPER_PRT2_2
+    },
+    "m3": {
+        "1": MAPPER_PRT3_1,
+        "2": MAPPER_PRT3_2
+    }
+}
