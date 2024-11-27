@@ -37,6 +37,7 @@ class ChordNode:
         self.node_list = []  # Nodes discovered so far
 
         self.logger = logging.getLogger("vs2lab.lab4.chordnode.ChordNode")
+        self.pending_lookups = {}
 
     def in_between(self, key, lower_bound, upper_bound) -> bool:
         """
@@ -154,9 +155,12 @@ class ChordNode:
                 lookup_id: int = request[1]
                 next_id: int = self.local_successor_node(lookup_id)
                 if next_id == self.node_id:
-                        self.channel.send_to([sender], (constChord.LOOKUP_REP, next_id))
+                        self.channel.send_to([sender], (constChord.LOOKUP_REP, next_id, lookup_id))
+                elif lookup_id in self.pending_lookups:
+                    self.pending_lookups[lookup_id].append(sender)
                 else: # RECURSIVE LOOKUP HERE
-                        self.channel.send_to([next_id], (constChord.LOOKUP_REQ, lookup_id))
+                        self.pending_lookups[lookup_id] = [sender]
+                        self.channel.send_to([str(next_id)], (constChord.LOOKUP_REQ, lookup_id))
 
                 # Finally do a sanity check
                 if not self.channel.exists(next_id):  # probe for existence
@@ -165,10 +169,12 @@ class ChordNode:
             if request[0] == constChord.LOOKUP_REP: # A recursive lookup reply
                 self.logger.info("Node {:04n} received LOOKUP REPLY {:04n} from {:04n}."
                                  .format(self.node_id, int(request[1]), int(sender)))
-                # TODO: return lookup reply recursivly - but who asked?
-                # Das einzige was mir einfällt wäre eine art liste an previous callern mitzuschicken
-                # und immer den obersten rausnehmen und weiterschicken bis man beim letzen angekommen ist
-                # ist aber irgendwie unschön, fällt dir was besseres ein?
+                succ_id: int = request[1]
+                lookup_id: int = request[2]
+                if lookup_id in self.pending_lookups:
+                    for receiver in self.pending_lookups[lookup_id]:
+                        self.channel.send_to([receiver], (constChord.LOOKUP_REP, succ_id, lookup_id))
+                
 
             elif request[0] == constChord.JOIN:
                 # Join request (the node was already registered above)
