@@ -1,6 +1,6 @@
-""" 
+"""
 Application with a critical section (CS)
-- sets up a group of peers 
+- sets up a group of peers
 - peers compete for some critical section
 - peers run in separate processes
 - multiprocessing should work on unix and windows
@@ -8,7 +8,7 @@ Application with a critical section (CS)
 """
 
 import sys
-import time 
+import time
 import logging
 import random
 import multiprocessing as mp
@@ -26,7 +26,7 @@ def create_and_run(num_bits, proc_class, enter_bar, run_bar):
     Create and run a peer
     :param num_bits: address range of the channel
     :param node_class: class of peer
-    :param enter_bar: barrier syncing channel population 
+    :param enter_bar: barrier syncing channel population
     :param run_bar: barrier syncing bootstrap
     """
     chan = lab_channel.Channel(n_bits=num_bits)
@@ -68,10 +68,10 @@ if __name__ == "__main__":  # if script is started from command line
         peer_proc.start()
 
     # terminate a random process after some time (10 seconds)
-    time.sleep(10)
+    time.sleep(4)
     proc_id = random.randint(0, len(children) - 1)
     proc_to_crash = children[proc_id]
-    del(children[proc_id])    
+    del(children[proc_id])
 
     proc_to_crash.terminate()
     proc_to_crash.join()

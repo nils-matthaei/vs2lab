@@ -40,6 +40,7 @@ class Process:
         self.queue = []  # The request queue list
         self.clock = 0  # The current logical clock
         self.logger = logging.getLogger("vs2lab.lab5.mutex.process.Process")
+        self.answered = []
 
     def __mapid(self, id='-1'):
         # resolve channel member address to a human friendly identifier
@@ -82,16 +83,31 @@ class Process:
         self.channel.send_to(self.other_processes, msg)
 
     def __allowed_to_enter(self):
-         # See who has sent a message (the set will hold at most one element per sender)
+        # See who has sent a message (the set will hold at most one element per sender)
         processes_with_later_message = set([req[1] for req in self.queue[1:]])
         # Access granted if this process is first in queue and all others have answered (logically) later
         first_in_queue = self.queue[0][1] == self.process_id
         all_have_answered = len(self.other_processes) == len(processes_with_later_message)
         return first_in_queue and all_have_answered
 
-    def __receive(self):
+    def __detect_crash(self):
+        # self.__cleanup_queue()
+        # processes_that_answered = set([req[1] for req in self.queue[1:]])
+
+        processes_that_answered = set([req[1] for req in self.queue if req[1] != self.process_id])
+
+        self.logger.warning("{} Processes that answered: {}".format(self.__mapid(), self.answered))
+        self.logger.warning("Other processes: {}".format(self.other_processes))
+        maybe_crashed = set(self.other_processes) - set(self.answered)
+        self.logger.warning("Crashed processes: {}".format(list(maybe_crashed)))
+        for proc in maybe_crashed:
+            self.logger.warning("Proc {} Removed {}".format(self.__mapid(), proc))
+            self.other_processes.remove(proc)
+            self.queue = [msg for msg in self.queue if msg[1] != proc]
+
+    def __receive(self, remove_unresponsive = False):
          # Pick up any message
-        _receive = self.channel.receive_from(self.other_processes, 10) 
+        _receive = self.channel.receive_from(self.other_processes, 5)
         if _receive:
             msg = _receive[1]
 
@@ -110,13 +126,16 @@ class Process:
                 self.__allow_to_enter(msg[1])
             elif msg[2] == ALLOW:
                 self.queue.append(msg)  # Append an ALLOW
+                self.answered.append(msg[1])
             elif msg[2] == RELEASE:
                 # assure release requester indeed has access (his ENTER is first in queue)
                 assert self.queue[0][1] == msg[1] and self.queue[0][2] == ENTER, 'State error: inconsistent remote RELEASE'
                 del (self.queue[0])  # Just remove first message
 
             self.__cleanup_queue()  # Finally sort and cleanup the queue
-        else:        
+        else:
+            if(remove_unresponsive):
+                self.__detect_crash()
             self.logger.warning("{} timed out on RECEIVE.".format(self.__mapid()))
 
     def init(self):
@@ -142,8 +161,9 @@ class Process:
                     .format(self.__mapid(), self.clock))
 
                 self.__request_to_enter()
+                self.answered.clear()
                 while not self.__allowed_to_enter():
-                    self.__receive()
+                    self.__receive(True)
 
                 # Stay in CS for some time ...
                 sleep_time = random.randint(0, 2000)
