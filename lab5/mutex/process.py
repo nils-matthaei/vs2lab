@@ -114,7 +114,7 @@ class Process:
 
     def __receive(self):
          # Pick up any message
-        _receive = self.channel.receive_from(self.other_processes, 10) 
+        _receive = self.channel.receive_from(self.other_processes, 20) 
         if _receive:
             msg = _receive[1]
             self.last_heard_from[msg[1]] = time.time()
