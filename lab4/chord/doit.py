@@ -37,6 +37,8 @@ class DummyChordClient:
         members = list(self.channel.channel.smembers('node'))
         node = random.choice(members).decode()
 
+        print(f"Looking for {random_key}")
+
         self.channel.send_to([node], (constChord.LOOKUP_REQ, random_key))
 
         while True:
@@ -45,7 +47,7 @@ class DummyChordClient:
             request = message[1]
 
             if request[0] == constChord.LOOKUP_REP:
-                print(f"Client received REP {int(request[1])} from {self.node_id} for LOOKUP on {int(sender)}.")
+                print(f"Client received REP {int(request[1])} from {int(sender)} for LOOKUP on {int(random_key)}.")
                 break
                 
         self.channel.send_to(  # a final multicast
