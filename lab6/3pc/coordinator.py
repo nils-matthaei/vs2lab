@@ -42,7 +42,7 @@ class Coordinator:
         self.participants = self.channel.subgroup('participant')
 
     def run(self):
-        if random.random() > 3/4:  # simulate a crash
+        if random.random() > 1:  # simulate a crash3/4
             return "Coordinator crashed in state INIT."
 
         # Request local votes from all participants
@@ -50,7 +50,7 @@ class Coordinator:
         self.channel.send_to(self.participants, VOTE_REQUEST)
 
 
-        if random.random() > 0:  # simulate a crash2/3
+        if random.random() > 1:  # simulate a crash2/3
             return "Coordinator crashed in state WAIT."
 
         # Collect votes from all participants
