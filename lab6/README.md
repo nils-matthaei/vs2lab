@@ -182,20 +182,20 @@ werden. Details finden Sie in der Literatur [1, Seite 443 ff].
 
 Das Protokoll besteht aus folgenden Schritten:
 
-- **Phase 1a:** Koordinator `C` startet in Zustand `INIT`, sendet dann `VOTE_REQUEST` an Teilnehmer `P_i, i ∈ [1;n]` und betritt Zustand `WAIT`.
-- **Phase 1b:** `P_i` startet in Zustand `INIT`, wartet auf `VOTE_REQUEST` von `C` und führt dann seine lokale Transaktion durch.
-  - Bei Erfolg der lokalen Transaktion betritt `P_i` Zustand `READY` und sendet `VOTE_COMMIT` an `C`.
-  - Bei Misserfolg der lokalen Transaktion betritt `P_i` Zustand `ABORT`, sendet `VOTE_ABORT` an `C` und terminiert.
+- **Phase 1a:** Koordinator `C` startet in Zustand `INIT`, sendet dann `VOTE_REQUEST` an Teilnehmer `P_i, i ∈ [1;n]` und betritt Zustand `WAIT`. [x]
+- **Phase 1b:** `P_i` startet in Zustand `INIT`, wartet auf `VOTE_REQUEST` von `C` und führt dann seine lokale Transaktion durch. [x]
+  - Bei Erfolg der lokalen Transaktion betritt `P_i` Zustand `READY` und sendet `VOTE_COMMIT` an `C`. [x]
+  - Bei Misserfolg der lokalen Transaktion betritt `P_i` Zustand `ABORT`, sendet `VOTE_ABORT` an `C` und terminiert. [x]
 - **Phase 2a:** `C` empfängt im Zustand `WAIT` Antworten aller `P_i`.
-  - Sind alle Antworten `VOTE_COMMIT`, dann betritt `C` Zustand `PRECOMMIT` und sendet `PREPARE_COMMIT` an alle `P_i`.
-  - Ist eine Antwort `VOTE_ABORT`, dann betritt `C` Zustand `ABORT`, sendet `GLOBAL_ABORT` an alle `P_i` und terminiert.
+  - Sind alle Antworten `VOTE_COMMIT`, dann betritt `C` Zustand `PRECOMMIT` und sendet `PREPARE_COMMIT` an alle `P_i`. [x]
+  - Ist eine Antwort `VOTE_ABORT`, dann betritt `C` Zustand `ABORT`, sendet `GLOBAL_ABORT` an alle `P_i` und terminiert. [x]
 - **Phase 2b:** `P_i` empfängt im Zustand `READY` Nachricht von `C`.
-  - Ist die Nachricht `PREPARE_COMMIT`, dann betritt `P_i` Zustand `PRECOMMIT` und sendet `READY_COMMIT` an `C`.
-  - Ist die Nachricht `GLOBAL_ABORT`, dann betritt `P_i` Zustand `ABORT` und terminiert.
+  - Ist die Nachricht `PREPARE_COMMIT`, dann betritt `P_i` Zustand `PRECOMMIT` und sendet `READY_COMMIT` an `C`. [x]
+  - Ist die Nachricht `GLOBAL_ABORT`, dann betritt `P_i` Zustand `ABORT` und terminiert. [x]
 - **Phase 3a:** `C` empfängt im Zustand `PRECOMMIT` Antworten aller `P_i`.
-  - Sind alle Antworten `READY_COMMIT`, dann betritt `C` Zustand `COMMIT` und sendet `GLOBAL_COMMIT` an alle `P_i`.
+  - Sind alle Antworten `READY_COMMIT`, dann betritt `C` Zustand `COMMIT` und sendet `GLOBAL_COMMIT` an alle `P_i`. [x]
 - **Phase 3b:** `P_i` empfängt im Zustand `PRECOMMIT` Nachricht von `C`.
-  - Ist die Nachricht `GLOBAL_COMMIT`, dann betritt `P_i` Zustand `COMMIT` und terminiert.
+  - Ist die Nachricht `GLOBAL_COMMIT`, dann betritt `P_i` Zustand `COMMIT` und terminiert. [x]
 
 #### 3.2.2 Verhalten bei Ausfällen
 
@@ -210,16 +210,16 @@ hier nicht näher betrachten wollen.
 Nach dem Zeitpunkt des Ausfalls eines Teilnehmers unterscheidet man zwei Fälle.
 
 1. Koordinator `C` ist in Zustand `WAIT` und ein Teilnehmer `P_i` fällt aus.
-   - `C` betritt Zustand `ABORT` und sendet `GLOBAL_ABORT` an alle Teilnehmer.
+   - `C` betritt Zustand `ABORT` und sendet `GLOBAL_ABORT` an alle Teilnehmer. [x]
 2. Koordinator `C` ist in Zustand `PRECOMMIT` und ein Teilnehmer `P_i` fällt aus.
-   - `C` betritt Zustand `COMMIT` und sendet `GLOBAL_COMMIT` an alle Teilnehmer.
+   - `C` betritt Zustand `COMMIT` und sendet `GLOBAL_COMMIT` an alle Teilnehmer.[x]
 
 ##### 3.2.2.b Terminierungsprotokolle bei Ausfall des Koordinators
 
 Nach dem Zeitpunkt des Koordinatorausfalls unterscheidet man drei Fälle.
 
 1. Teilnehmer `P_i` ist in Zustand `INIT` und Koordinator `C` fällt aus.
-   - `P_i` wechselt in Zustand `ABORT` und terminiert.
+   - `P_i` wechselt in Zustand `ABORT` und terminiert. [x]
 2. `P_i` ist in Zustand `READY` und `C` fällt aus.
    - Alle Teilnehmer sind im Zustand `INIT`, `READY`, `ABORT` oder `PRECOMMIT`.
    - Ein Teilnehmer `P_k` wird als neuer Koordinator bestimmt und terminiert die globale Transaktion.
