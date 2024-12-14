@@ -54,7 +54,6 @@ class Participant:
     def init(self):
         self.channel.bind(self.participant)
         self.coordinator = self.channel.subgroup('coordinator')
-        print(self.coordinator)
         self.all_participants = self.channel.subgroup('participant')
         self._enter_state('INIT')  # Start in local INIT state.
         self.coordinator_state = 'INIT'
@@ -119,9 +118,9 @@ class Participant:
         else:
             assert (coordinator_msg == GLOBAL_ABORT  or self.decision == LOCAL_ABORT)
             self.coordinator_state = 'ABORT'
-            self._enter_state('ABORT', 'msg from coordinator was not PREPARE_COMMIT')
+            self._enter_state('ABORT')
 
-            if coordinator_msg == GLOBAL_ABORT: # Not sure if this can even happen, but in case it happens, we terminate if GLOBAL_ABORT
+            if coordinator_msg == GLOBAL_ABORT:
                 return "Participant {} terminated in state {} due to {}. (Own decision was {})".format(
                 self.participant, self.state, coordinator_msg, self.decision)
 
