@@ -153,7 +153,7 @@ class Participant:
             self._enter_state('ABORT', 'New coordinator has communicated ABORT')
             return
         elif new_coord_state == 'COMMIT':
-            self._enter_state('COMMIT', 'New coordinator has communicated ABORT')
+            self._enter_state('COMMIT', 'New coordinator has communicated COMMIT')
             return
         
         # Coordinator state was not ABORT or COMMIT, so we wait for its decision
